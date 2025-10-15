@@ -73,10 +73,12 @@ export async function POST(request) {
       .where(eq(testProgress.id, newProgress.id))
       .limit(1);
 
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+
     return NextResponse.json({
       success: true,
       progress,
-      testLink: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/test/mbti?token=${testToken}`,
+      testLink: `${baseUrl}/test/mbti?token=${testToken}`,
       message: 'Test started successfully',
     });
   } catch (error) {

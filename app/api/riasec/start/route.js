@@ -41,7 +41,8 @@ export async function POST(request) {
 
     if (existing) {
       // Return existing progress with testLink
-      const testLink = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/test/riasec?token=${existing.testToken}`;
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+      const testLink = `${baseUrl}/test/riasec?token=${existing.testToken}`;
       return NextResponse.json({
         success: true,
         progress: existing,
@@ -75,7 +76,8 @@ export async function POST(request) {
       .where(eq(testProgress.id, newProgress.id))
       .limit(1);
 
-    const testLink = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/test/riasec?token=${testToken}`;
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+    const testLink = `${baseUrl}/test/riasec?token=${testToken}`;
 
     return NextResponse.json({
       success: true,

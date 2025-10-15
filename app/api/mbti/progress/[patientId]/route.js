@@ -43,13 +43,15 @@ export async function GET(request, { params }) {
         .limit(1);
     }
 
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+
     return NextResponse.json({
       success: true,
       hasTest: true,
       progress,
       result,
       testLink: progress.testToken
-        ? `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/test/mbti?token=${progress.testToken}`
+        ? `${baseUrl}/test/mbti?token=${progress.testToken}`
         : null,
     });
   } catch (error) {

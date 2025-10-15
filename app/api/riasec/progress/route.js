@@ -59,13 +59,15 @@ export async function GET(request) {
       result = riasecResult;
     }
 
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+
     return NextResponse.json({
       success: true,
       status: progress.status,
       progress,
       result,
       testLink: progress.testToken
-        ? `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/test/riasec?token=${progress.testToken}`
+        ? `${baseUrl}/test/riasec?token=${progress.testToken}`
         : null,
     });
   } catch (error) {
