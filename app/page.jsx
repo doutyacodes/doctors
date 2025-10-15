@@ -152,7 +152,7 @@ export default function LandingPage() {
                 </Button>
               </Link>
               <Link href="#features">
-                <Button variant="outline" className="w-full sm:w-auto h-14 px-8 border-2 border-white/20 text-white hover:bg-white/10 text-lg font-semibold backdrop-blur-sm">
+                <Button variant="outline" className="w-full sm:w-auto h-14 px-8 border-2 border-white/20 hover:text-white hover:bg-white/10 text-lg font-semibold backdrop-blur-sm">
                   Learn More
                 </Button>
               </Link>
