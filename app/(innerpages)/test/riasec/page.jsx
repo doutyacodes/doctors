@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Activity, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Activity, ArrowRight, ArrowLeft, CheckCircle } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 function RIASECTestContent() {
@@ -20,6 +20,9 @@ function RIASECTestContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [resolvedPatientId, setResolvedPatientId] = useState(null);
+  const [patientInfo, setPatientInfo] = useState(null);
+  const [testCompleted, setTestCompleted] = useState(false);
+  const [completedResult, setCompletedResult] = useState(null);
 
   useEffect(() => {
     fetchQuestions();
@@ -37,6 +40,15 @@ function RIASECTestContent() {
 
       if (response.ok && data.success) {
         setQuestions(data.questions);
+        // Check if patient info is returned
+        if (data.patientName) {
+          setPatientInfo({ name: data.patientName });
+        }
+        // Check if test is already completed
+        if (data.alreadyCompleted) {
+          setTestCompleted(true);
+          setCompletedResult(data.result);
+        }
       } else {
         setError(data.error || 'Failed to fetch questions');
       }
@@ -158,6 +170,56 @@ function RIASECTestContent() {
     );
   }
 
+  // Test Already Completed
+  if (testCompleted) {
+    return (
+      <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-teal-50/30 to-slate-50 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="max-w-md w-full"
+        >
+          <Card className="p-8 text-center bg-white/80 backdrop-blur-sm shadow-xl">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", duration: 0.5, delay: 0.2 }}
+              className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6"
+            >
+              <CheckCircle className="w-12 h-12 text-white" />
+            </motion.div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">Test Already Completed</h2>
+            {patientInfo && (
+              <p className="text-lg text-gray-700 mb-4">
+                Hi <span className="font-semibold text-teal-600">{patientInfo.name}</span>!
+              </p>
+            )}
+            <p className="text-gray-600 mb-6">
+              You have already completed the RIASEC Career Assessment. Your results have been saved.
+            </p>
+            {completedResult && (
+              <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl p-6 mb-6">
+                <p className="text-sm text-gray-600 mb-2">Your Holland Code</p>
+                <p className="text-4xl font-bold text-teal-600 mb-2">
+                  {completedResult.topThree}
+                </p>
+                <p className="text-xs text-gray-500">
+                  Completed on {new Date(completedResult.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            )}
+            <Button
+              onClick={() => token ? router.push('/') : router.push(`/patient/${patientId}`)}
+              className="w-full bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800"
+            >
+              {token ? 'Close' : 'Back to Dashboard'}
+            </Button>
+          </Card>
+        </motion.div>
+      </div>
+    );
+  }
+
   if (questions.length === 0) {
     return (
       <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-teal-50/30 to-slate-50 flex items-center justify-center">
@@ -186,6 +248,20 @@ function RIASECTestContent() {
         >
           {/* Header */}
           <div className="mb-6 sm:mb-8 text-center">
+            {/* Patient Greeting */}
+            {patientInfo && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="mb-4"
+              >
+                <p className="text-lg sm:text-xl text-gray-700">
+                  Welcome, <span className="font-bold text-teal-600">{patientInfo.name}</span>!
+                </p>
+              </motion.div>
+            )}
+
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -197,9 +273,28 @@ function RIASECTestContent() {
               </div>
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">RIASEC Assessment</h1>
             </motion.div>
-            <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 px-4">
-              Rate each statement based on how much you agree or disagree
-            </p>
+
+            {/* Test Description */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="max-w-2xl mx-auto mb-4 sm:mb-6 px-4"
+            >
+              <p className="text-gray-700 font-medium mb-2 text-sm sm:text-base">
+                Holland Code Career Interest Assessment
+              </p>
+              <p className="text-gray-600 text-xs sm:text-sm">
+                This assessment helps identify your career interests across six personality types:
+                <span className="font-semibold"> Realistic</span>,
+                <span className="font-semibold"> Investigative</span>,
+                <span className="font-semibold"> Artistic</span>,
+                <span className="font-semibold"> Social</span>,
+                <span className="font-semibold"> Enterprising</span>, and
+                <span className="font-semibold"> Conventional</span>.
+                Rate each statement based on how much you agree or disagree.
+              </p>
+            </motion.div>
 
             {/* Progress Bar */}
             <div className="w-full bg-gray-200 rounded-full h-2.5 sm:h-3 mb-2">

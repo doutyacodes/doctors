@@ -20,6 +20,8 @@ function MBTITestContent() {
   const [error, setError] = useState(null);
   const [isCompleting, setIsCompleting] = useState(false);
   const [testResult, setTestResult] = useState(null);
+  const [patientInfo, setPatientInfo] = useState(null);
+  const [testCompleted, setTestCompleted] = useState(false);
 
   // Fetch questions on mount
   useEffect(() => {
@@ -43,6 +45,15 @@ function MBTITestContent() {
 
       if (response.ok && data.questions) {
         setQuestions(data.questions);
+        // Check if patient info is returned
+        if (data.patientName) {
+          setPatientInfo({ name: data.patientName });
+        }
+        // Check if test is already completed
+        if (data.alreadyCompleted) {
+          setTestCompleted(true);
+          setTestResult(data.result);
+        }
       } else {
         setError(data.error || 'Failed to load questions');
       }
@@ -140,6 +151,56 @@ function MBTITestContent() {
     );
   }
 
+  // Test Already Completed
+  if (testCompleted) {
+    return (
+      <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-purple-50/30 to-slate-50 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="max-w-md w-full"
+        >
+          <Card className="p-8 text-center bg-white/80 backdrop-blur-sm shadow-xl">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", duration: 0.5, delay: 0.2 }}
+              className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6"
+            >
+              <CheckCircle className="w-12 h-12 text-white" />
+            </motion.div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">Test Already Completed</h2>
+            {patientInfo && (
+              <p className="text-lg text-gray-700 mb-4">
+                Hi <span className="font-semibold text-purple-600">{patientInfo.name}</span>!
+              </p>
+            )}
+            <p className="text-gray-600 mb-6">
+              You have already completed the MBTI Assessment. Your results have been saved.
+            </p>
+            {testResult && (
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 mb-6">
+                <p className="text-sm text-gray-600 mb-2">Your Personality Type</p>
+                <p className="text-4xl font-bold text-purple-600 mb-2">
+                  {testResult.personalityType}
+                </p>
+                <p className="text-xs text-gray-500">
+                  Completed on {new Date(testResult.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            )}
+            <Button
+              onClick={() => token ? router.push('/') : router.push(`/patient/${patientId}`)}
+              className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
+            >
+              {token ? 'Close' : 'Back to Dashboard'}
+            </Button>
+          </Card>
+        </motion.div>
+      </div>
+    );
+  }
+
   // No questions loaded
   if (questions.length === 0) {
     return (
@@ -161,6 +222,20 @@ function MBTITestContent() {
         >
           {/* Header */}
           <div className="mb-8 text-center">
+            {/* Patient Greeting */}
+            {patientInfo && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="mb-4"
+              >
+                <p className="text-xl text-gray-700">
+                  Welcome, <span className="font-bold text-purple-600">{patientInfo.name}</span>!
+                </p>
+              </motion.div>
+            )}
+
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -172,9 +247,26 @@ function MBTITestContent() {
               </div>
               <h1 className="text-4xl font-bold text-gray-900">MBTI Assessment</h1>
             </motion.div>
-            <p className="text-gray-600 mb-6">
-              Answer each question based on your natural preferences
-            </p>
+
+            {/* Test Description */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="max-w-2xl mx-auto mb-6"
+            >
+              <p className="text-gray-700 font-medium mb-2">
+                Myers-Briggs Type Indicator
+              </p>
+              <p className="text-gray-600 text-sm">
+                This assessment helps identify your personality type based on four key dimensions:
+                <span className="font-semibold"> Extraversion/Introversion</span>,
+                <span className="font-semibold"> Sensing/Intuition</span>,
+                <span className="font-semibold"> Thinking/Feeling</span>, and
+                <span className="font-semibold"> Judging/Perceiving</span>.
+                Answer each question based on your natural preferences.
+              </p>
+            </motion.div>
 
             {/* Progress Bar */}
             <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
