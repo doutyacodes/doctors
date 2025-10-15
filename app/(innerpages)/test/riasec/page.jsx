@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Activity, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function RIASECTest() {
+function RIASECTestContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const patientId = searchParams.get('patientId');
@@ -341,5 +341,20 @@ export default function RIASECTest() {
         </motion.div>
       )}
     </div>
+  );
+}
+
+export default function RIASECTest() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-teal-50/30 to-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading questions...</p>
+        </div>
+      </div>
+    }>
+      <RIASECTestContent />
+    </Suspense>
   );
 }

@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Brain, ArrowRight, CheckCircle } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function MBTITest() {
+function MBTITestContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const patientId = searchParams.get('patientId');
@@ -289,5 +289,20 @@ export default function MBTITest() {
         </motion.div>
       )}
     </div>
+  );
+}
+
+export default function MBTITest() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-purple-50/30 to-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading test questions...</p>
+        </div>
+      </div>
+    }>
+      <MBTITestContent />
+    </Suspense>
   );
 }
