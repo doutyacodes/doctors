@@ -55,6 +55,7 @@ export default function DoctorDashboard() {
     return `${Math.floor(diff / 30)} months ago`;
   };
 
+  
   const getInitials = (name) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
