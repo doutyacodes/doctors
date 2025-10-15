@@ -68,6 +68,14 @@ export async function POST(request) {
       );
     }
 
+    // Check if test is already completed
+    if (progress.status === 'completed') {
+      return NextResponse.json(
+        { error: 'This test has already been completed' },
+        { status: 400 }
+      );
+    }
+
     // Check if token expired
     if (progress.tokenExpiresAt && new Date() > new Date(progress.tokenExpiresAt)) {
       return NextResponse.json(
